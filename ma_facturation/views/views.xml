@@ -1,0 +1,258 @@
+<odoo>
+    <data>
+        <!-- VUE FORM invoicing-->
+        <record id="view_invoice_form" model="ir.ui.view">
+            <field name="name">my.invoicing.form</field>
+            <field name="model">my.invoicing</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_done" type="object" string="Valider"
+                                attrs="{'invisible':['|',('state', 'in', ['cancel']), ('state', 'in', ['done'])]}"/>
+                        <button name="action_new" type="object" string="Remettre en brouillon"
+                                attrs="{'invisible':[('state', 'not in', ['cancel'])]}" class="oe_highlight"/>
+                        <button name="action_cancel" type="object" string="Annuler"
+                                attrs="{'invisible': ['|',('state', 'in', ['cancel']), ('state', 'in', ['new'])]}"/>
+                        <field name="state" widget="statusbar" force_save="1"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="ref" placeholder="Reference facture" attrs="{'readonly': ['|',('state', '=', 'done'),('state', 'in', ['cancel'])]}"/>
+                            </h1>
+                        </div>
+                        <group string="Informations">
+                            <group>
+                                <field name="customers_id" options="{'no_create': True, 'no_edit': True}" attrs="{'readonly': ['|',('state', '=', 'done'),('state', 'in', ['cancel'])]}"/>
+                                <field name="currency_id" invisible="1"/>
+
+                            </group>
+                            <group>
+                                <field name="date" attrs="{'readonly': ['|',('state', '=', 'done'),('state', 'in', ['cancel'])]}"/>
+                                <field name="amount_cumul"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="Ligne d'articles">
+
+                                <field name="order_line_ids" attrs="{'readonly': ['|',('state', '=', 'done'),('state', 'in', ['cancel'])]}">
+                                    <tree editable="bottom">
+                                        <field name="article_id"/>
+                                        <field name="price"/>
+                                        <field name="quantity"/>
+                                        <field name="total" sum="Total" widget="monetary"/>
+                                        <field name="currency_id" invisible="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- VUE LIST invoicing-->
+        <record id="view_invoice_tree" model="ir.ui.view">
+            <field name="name">my.invoicing.tree</field>
+            <field name="model">my.invoicing</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <header>
+                        <button name="%(my_invoicing_print_invoice)d" type="action" string="Imprimer la fiche"/>
+                    </header>
+                    <field name="date"/>
+                    <field name="ref"/>
+                    <field name="customers_id"/>
+                    <field name="amount_cumul" sum="total"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="state" widget="badge"
+                           decoration-primary="state == 'new'"
+                           decoration-danger="state == 'cancel'"
+                           decoration-success="state == 'done'"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- VUE SEARCH invoicing-->
+        <record id="view_invoice_search" model="ir.ui.view">
+            <field name="name">my.invoicing.search</field>
+            <field name="model">my.invoicing</field>
+            <field name="arch" type="xml">
+                <search string="Recherche">
+                    <field name="customers_id" string="Client" filter_domain="[('customers_id', 'ilike', self)]"/>
+                    <field name="ref" string="Reference" filter_domain="[('ref', 'ilike', self)]"/>
+                    <filter name="customers_id" string="Client"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Client" name="group_by_customer" context="{'group_by': 'customers_id'}"/>
+                        <filter string="Date" name="group_by_date" context="{'group_by': 'date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="my_invoicing_action" model="ir.actions.act_window">
+            <field name="name">Ma Facturation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">my.invoicing</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <!-- /////////////////////////////////////////////////////////////////////////////////////////////////
+                                           CUSTOMER
+         ////////////////////////////////////////////////////////////////////////////////////////////////////
+         -->
+
+        <!-- VUE KANBAN customer-->
+        <record id="view_customer_kanban" model="ir.ui.view">
+            <field name="name">customer.customer.kanban</field>
+            <field name="model">customer.customer</field>
+            <field name="arch" type="xml">
+                <kanban>
+                    <field name="id"/>
+                    <field name="res_id"/>
+                    <field name="image"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_customer_customer_kanban">
+                                <div class="o_kanban_image">
+                                    <img t-att-src="kanban_image('customer.customer','image',record.id.raw_value)"
+                                         alt="image"/>
+                                </div>
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="display_name"/>
+                                    </strong>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- VUE FORM CUSTOMER-->
+        <record id="view_customer_form" model="ir.ui.view">
+            <field name="name">customer.customer.form</field>
+            <field name="model">customer.customer</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <div class="o_employee_avatar">
+                            <field name="image" widget="image" class="oe_avatar"/>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="res_id"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Adresse">
+                                <field name="street"/>
+                                <field name="city"/>
+                            </group>
+                            <group string="Contacts">
+                                <field name="phone"/>
+                                <field name="mobile"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="Factures">
+                                <field name="bill_ids"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- VUE LIST customer-->
+        <record id="view_customer_tree" model="ir.ui.view">
+            <field name="name">customer.customer.tree</field>
+            <field name="model">customer.customer</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="res_id"/>
+                    <field name="phone"/>
+                    <field name="city"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- VUE SEARCH CUSTOMER-->
+        <record id="view_customer_search" model="ir.ui.view">
+            <field name="name">customer.customer.search</field>
+            <field name="model">customer.customer</field>
+            <field name="arch" type="xml">
+                <search string="Recherche">
+                    <field name="res_id" string="Nom du client" filter_domain="[('res_id', 'ilike', self)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Ville" name="group_by_city" context="{'group_by': 'city'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- ACTION CUSTOMER-->
+        <record id="customer_action" model="ir.actions.act_window">
+            <field name="name">Clients</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">customer.customer</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    There is no examples click here to add new ModelTitle.
+                </p>
+            </field>
+        </record>
+
+        <!-- VUE FORM HERITÉE CONTACTS-->
+        <record id="partner_form_inherit_view" model="ir.ui.view">
+            <field name="name">res.partner.inherit</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='vat']" position="after">
+                    <!-- Add your fields or attributes here -->
+                    <field name="customer" widget="boolean_toggle" invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!--les actions -->
+        <record id="contact_act_window" model="ir.actions.act_window">
+            <field name="name">Contacts</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    There is no examples click here to add new ModelTitle.
+                </p>
+            </field>
+        </record>
+
+
+        <!--les actions article -->
+        <record id="article_action" model="ir.actions.act_window">
+            <field name="name">Articles</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    There is no examples click here to add new ModelTitle.
+                </p>
+            </field>
+        </record>
+
+
+        <!-- Top menu item -->
+        <menuitem id="menu_root" name="Ma Facturation" web_icon="my_invoicing,static/description/icon.png"/>
+        <menuitem id="menu_invoicing" name="Clients" parent="menu_root" action="my_invoicing_action"/>
+        <menuitem id="menu_owners" name="Factures clients" parent="menu_invoicing" action="my_invoicing_action"/>
+        <menuitem id="menu_owners" name="Clients" parent="menu_invoicing" action="customer_action"/>
+        <menuitem id="menu_article" name="Articles" parent="menu_root" action="article_action"/>
+        <menuitem id="menu_conf" name="Configuration" parent="menu_root" action="my_invoicing_action"/>
+
+    </data>
+</odoo>

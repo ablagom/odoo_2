@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ma_facturation_print_invoice2" model="ir.actions.report">
+        <field name="name">Imprimer une facture(sans en-tête)</field>
+        <field name="model">ma.facturation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ma_facturation.report_facturation2</field>
+        <field name="report_file">ma_facturation.report_facturation2</field>
+        <field name="print_report_name">'Facture Client'</field>
+        <field name="binding_model_id" ref="model_ma_facturation"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_facturation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <!--t t-call="web.external_layout"-->
+                    <div class="container">
+                        <div class="page" style="float: left; width: 50%;margin: 20px 0">
+                            <h2> Facture client
+
+                            </h2>
+                            <h5>N°
+                                <span t-field="o.ref" style="font-size: 16pt"/>
+                            </h5>
+                            <div>
+                                <strong>Client:</strong>
+                                <span t-field="o.customers_id.res_id.name"/>
+                                <br/>
+                                <br/>
+                            </div>
+
+
+                        </div>
+                        <div class="col">
+                            <h2>
+                                ________________________________
+                            </h2>
+
+                            <div>
+                                <strong>Date de facturation:</strong>
+                                <span t-field="o.date"/>
+                                <br/>
+                                <br/>
+                            </div>
+                            <div>
+                                <strong>Montant:</strong>
+                                <span t-field="o.amount_cumul"
+                                      t-esc-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                <br/>
+                                <br/>
+                            </div>
+                        </div>
+                        <br/>
+                        <br/>
+                        <!-- Table de details -->
+                        <div style="clear: left;">
+                            <h3>Ligne d'article</h3>
+                        </div>
+
+                        <table class="table table-sm mb32">
+                            <thead>
+                                <tr>
+                                    <th>ARTICLE</th>
+                                    <th>PRIX</th>
+                                    <th>QUANTITE</th>
+                                    <th>MONTANT TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="lines" t-value="o.order_line_ids.sorted(key=lambda l: (-l.id), reverse=True)"/>
+                                <t t-foreach="lines" t-as="line">
+                                    <tr>
+                                        <td class="text-center">
+                                            <span t-esc="line.article_id.name"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="line.price"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="line.quantity"
+                                                  t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-esc="line.total"
+                                                  t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <br/>
+                        <br/>
+                        <p class="">
+                            <strong>Total à Payer:</strong>
+                            <strong style="font-size:20px" t-esc="o.amount_cumul"
+                                    t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                        </p>
+                        <br/>
+                        <br/>
+                        <p class="text-right signature">
+                            <strong>Signature autorisée</strong>
+                        </p>
+                    </div>
+                <!--/t-->
+            </t>
+        </t>
+
+    </template>
+</odoo>

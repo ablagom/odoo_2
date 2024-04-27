@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- categorie de securité-->
+        <record id="ma_facturation_cat" model="ir.module.category">
+            <field name="name">Ma Facturation</field>
+        </record>
+
+        <!-- les groups-->
+        <record id="group_users" model="res.groups">
+            <field name="name">Utilisateur</field>
+            <field name="category_id" ref="ma_facturation.ma_facturation_cat"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_managers" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="ma_facturation.ma_facturation_cat"/>
+            <field name="implied_ids" eval="[(4, ref('ma_facturation.group_users'))]"/>
+            <!-- Dernier niveau d'acces-->
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+        <!-- l'acces par defaut donné a l'admin a l'installation-->
+        <record id="base.default_user" model="res.users">
+            <field name="groups_id" eval="[(4, ref('ma_facturation.group_managers'))]"/>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+ma_facturation.access_facturation_manager,access_facturation,ma_facturation.model_ma_facturation,ma_facturation.group_managers,1,1,1,1
+ma_facturation.access_facturation_user,access_facturation,ma_facturation.model_ma_facturation,ma_facturation.group_users,1,0,0,0
+
+ma_facturation.access_customer_customer_manager,access_customer_customer,ma_facturation.model_customer_customer,ma_facturation.group_managers,1,1,1,1
+ma_facturation.access_customer_customer_user,access_customer_customer,ma_facturation.model_customer_customer,ma_facturation.group_users,1,0,0,0
+
+ma_facturation.access_res_partner_manager,access_res_partner,ma_facturation.model_res_partner,ma_facturation.group_managers,1,1,1,1
+ma_facturation.access_res_partner_user,access_res_partner,ma_facturation.model_res_partner,ma_facturation.group_users,1,0,0,0
+
+ma_facturation.access_order_line_manager,access_order,ma_facturation.model_order_line,ma_facturation.group_managers,1,1,1,1
+ma_facturation.access_order_line_user,access_order,ma_facturation.model_order_line,ma_facturation.group_users,1,0,0,0
+
